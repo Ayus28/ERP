@@ -3,24 +3,28 @@ document.addEventListener("DOMContentLoaded", () => {
     const isLoggedIn = localStorage.getItem("isLoggedIn");
     const userRole = localStorage.getItem("userRole");
 
-    // Route Guard: Access check
+    // Route Guard: Agar login nahi hai toh sidhe login page par phenko
     if (!isLoggedIn) {
         window.location.href = "login.html";
         return;
     }
 
-    // Safety Cross-Check: Prevent student from snooping into professor's layout
-    const currentFile = window.location.pathname.split("/").pop();
-    if (userRole === "student" && currentFile === "professor.html") {
+    // Path cleanup controller (Handles paths safely everywhere)
+    const currentPath = window.location.pathname.toLowerCase();
+
+    // 1. Agar Student galat raste se professor page par aana chahe
+    if (userRole === "student" && currentPath.includes("professor.html")) {
         window.location.href = "student.html";
         return;
     }
-    if (userRole === "professor" && currentFile === "student.html") {
+
+    // 2. Agar Professor student wale dashboard par chala jaye
+    if (userRole === "professor" && currentPath.includes("student.html")) {
         window.location.href = "professor.html";
         return;
     }
 
-    // Load data components
+    // Agar sab sahi hai, toh data render kar do
     renderStudents(userRole);
 });
 
