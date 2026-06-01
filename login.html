@@ -197,15 +197,14 @@ function handleLogin() {
     const role = document.getElementById("role").value;
     const password = document.getElementById("password").value;
 
-    // Direct Local Storage Authentication Matrix Mapping
     if (role === "professor" && password === "admin123") {
         localStorage.setItem("isLoggedIn", "true");
         localStorage.setItem("userRole", "professor");
-        window.location.href = "index.html"; 
+        window.location.href = "professor.html"; // Ye file sahi folder mein honi chahiye
     } else if (role === "student" && password === "student123") {
         localStorage.setItem("isLoggedIn", "true");
         localStorage.setItem("userRole", "student");
-        window.location.href = "index.html"; 
+        window.location.href = "student.html";   // Ye file sahi folder mein honi chahiye
     } else {
         alert("Authentication Terminated: Invalid Access Credentials.");
     }
