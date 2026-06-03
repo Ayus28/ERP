@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Faculty Matrix Center | DPG</title>
+	<style>
+		@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+        
+		:root {
+			--bg-dark: #0f172a;
+			--card-bg: rgba(255, 255, 255, 0.02);
+			--card-border: rgba(255, 255, 255, 0.08);
+			--text-main: #f8fafc;
+			--text-muted: #94a3b8;
+			--accent-prof: #a855f7;
+			--accent-blue: #38bdf8;
+		}
+
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+			font-family: 'Plus Jakarta Sans', sans-serif;
+		}
+
+		body {
+			background-color: var(--bg-dark);
+			color: var(--text-main);
+			min-height: 100vh;
+			padding: 40px 20px;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+		}
+
+		/* 📋 Top Navbar & Three Dot Trigger */
+		.top-bar {
+			width: 100%;
+			max-width: 1100px;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-bottom: 40px;
+			background: var(--card-bg);
+			border: 1px solid var(--card-border);
+			padding: 15px 25px;
+			border-radius: 16px;
+			backdrop-filter: blur(10px);
+		}
+
+		.menu-trigger {
+			background: rgba(255, 255, 255, 0.05);
+			border: 1px solid var(--card-border);
+			color: var(--text-main);
+			width: 45px;
+			height: 45px;
+			border-radius: 12px;
+			font-size: 22px;
+			cursor: pointer;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			transition: 0.3s;
+		}
+
+		.menu-trigger:hover {
+			background: var(--accent-prof);
+			box-shadow: 0 0 15px rgba(168, 85, 247, 0.4);
+		}
+
+		.logout-btn {
+			background: rgba(239, 68, 68, 0.1);
+			border: 1px solid rgba(239, 68, 68, 0.2);
+			color: #ef4444;
+			padding: 8px 18px;
+			border-radius: 10px;
+			cursor: pointer;
+			font-weight: 600;
+			transition: 0.2s;
+		}
+
+		.logout-btn:hover { background: #ef4444; color: #fff; }
+
+		/* 🧑‍🏫 LEFT SIDEBAR: Professor Profile (Hidden by default) */
+		.profile-sidebar {
+			position: fixed;
+			top: 0;
+			left: -350px; /* Hidden state */
+			width: 340px;
+			height: 100vh;
+			background: #0b0f19;
+			border-right: 1px solid var(--card-border);
+			z-index: 100;
+			padding: 40px 30px;
+			box-shadow: 20px 0 50px rgba(0,0,0,0.8);
+			transition: left 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+			overflow-y: auto;
+		}
+
+		.profile-sidebar.open {
+			left: 0; /* Visible state */
+		}
+
+		.close-sidebar {
+			position: absolute;
+			top: 20px;
+			right: 20px;
+			background: none;
+			border: none;
+			color: var(--text-muted);
+			font-size: 24px;
+			cursor: pointer;
+		}
+
+		.prof-avatar-big {
+			width: 110px;
+			height: 110px;
+			border-radius: 50%;
+			border: 3px solid var(--accent-prof);
+			margin: 20px auto;
+			display: block;
+			object-fit: cover;
+		}
+
+		.sidebar-title {
+			text-align: center;
+			margin-bottom: 30px;
+		}
+
+		.sidebar-title h3 { font-size: 22px; color: #fff; }
+		.sidebar-title p { color: var(--accent-prof); font-weight: 600; font-size: 13px; }
+
+		.info-stack {
+			margin-bottom: 20px;
+			background: rgba(255,255,255,0.02);
+			padding: 12px 15px;
+			border-radius: 12px;
+			border: 1px solid rgba(255,255,255,0.04);
+		}
+
+		.info-stack label {
+			display: block;
+			font-size: 11px;
+			color: var(--text-muted);
+			text-transform: uppercase;
+			letter-spacing: 0.5px;
+			margin-bottom: 4px;
+		}
+
+		.info-stack span {
+			font-size: 14px;
+			color: var(--text-main);
+			font-weight: 500;
+		}
+
+		/* 📑 Main Dashboard Layout */
+		.dashboard-container {
+			width: 100%;
+			max-width: 1100px;
+		}
+
+		.welcome-section {
+			margin-bottom: 35px;
+		}
+
+		.welcome-section h1 { font-size: 32px; font-weight: 800; color: #fff; }
+
+		/* ⚡ ERP Core Control Panel Grid */
+		.control-grid {
+			display: grid;
+			grid-template-columns: 1fr;
+			gap: 30px;
+		}
+
+		.matrix-card {
+			background: var(--card-bg);
+			border: 1px solid var(--card-border);
+			border-radius: 20px;
+			padding: 30px;
+			backdrop-filter: blur(10px);
+		}
+
+		.matrix-card h2 {
+			font-size: 20px;
+			margin-bottom: 20px;
+			color: var(--accent-blue);
+			display: flex;
+			align-items: center;
+			gap: 10px;
+		}
+
+		/* Data Controls (Class Filter & Search) */
+		.filter-row {
+			display: flex;
+			gap: 15px;
+			margin-bottom: 20px;
+			flex-wrap: wrap;
+		}
+
+		select, input {
+			background: rgba(15, 23, 42, 0.6);
+			border: 1px solid rgba(255, 255, 255, 0.1);
+			color: #fff;
+			padding: 10px 15px;
+			border-radius: 10px;
+			outline: none;
+			font-size: 14px;
+		}
+
+		select option { background-color: #0f172a; }
+
+		/* Custom Responsive Table Matrix */
+		.table-wrapper {
+			overflow-x: auto;
+			width: 100%;
+		}
+
+		table {
+			width: 100%;
+			border-collapse: collapse;
+			text-align: left;
+			font-size: 14px;
+		}
+
+		th {
+			background: rgba(255, 255, 255, 0.04);
+			padding: 12px 15px;
+			color: var(--text-muted);
+			font-weight: 600;
+			border-bottom: 1px solid var(--card-border);
+		}
+
+		td {
+			padding: 14px 15px;
+			border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+		}
+
+		.input-score {
+			width: 70px;
+			padding: 6px;
+			text-align: center;
+		}
+
+		/* Attendance Checkbox Switch styling */
+		.checkbox-container {
+			display: inline-block;
+			position: relative;
+			cursor: pointer;
+		}
+
+		/* Save Button */
+		.action-btn {
+			background: var(--accent-blue);
+			border: none;
+			color: #fff;
+			padding: 12px 24px;
+			border-radius: 10px;
+			cursor: pointer;
+			font-weight: 600;
+			margin-top: 20px;
+			transition: 0.2s;
+		}
+		.action-btn:hover { background: #0284c7; }
+
+		/* Overlay Background when sidebar is open */
+		.sidebar-overlay {
+			display: none;
+			position: fixed;
+			top: 0; left: 0; width: 100vw; height: 100vh;
+			background: rgba(0,0,0,0.5);
+			z-index: 99;
+			backdrop-filter: blur(4px);
+		}
+		.sidebar-overlay.active { display: block; }
+	</style>
+</head>
+<body>
+
+	<!-- Overlay back shadow -->
+	<div class="sidebar-overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+	<!-- 🧑‍🏫 LEFT SIDEBAR PANEL: Professor Profile Details -->
+	<div class="profile-sidebar" id="profileSidebar">
+		<button class="close-sidebar" onclick="toggleSidebar()">×</button>
+		<img class="prof-avatar-big" src="professor.jpg" onerror="this.src='https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=200'">
+		<div class="sidebar-title">
+			<h3 id="profName">Dr. Anjali Sharma</h3>
+			<p id="profId">FACULTY ID: #DPG-2026-88</p>
+		</div>
+
+		<div class="info-stack">
+			<label>Education / Degree</label>
+			<span>Ph.D in Computer Science, M.Tech (IIT Delhi)</span>
+		</div>
+		<div class="info-stack">
+			<label>Contact Number</label>
+			<span>+91 98765 43210</span>
+		</div>
+		<div class="info-stack">
+			<label>Official Address</label>
+			<span>Block-C, Faculty Chambers, DPG Degree College, Gurugram</span>
+		</div>
+		<div class="info-stack">
+			<label>Core Subjects Specialize</label>
+			<!-- Single subject targeting overlapping modules across streams -->
+			<span>Data Structures, Python Automation & Advanced DBMS</span>
+		</div>
+		<div class="info-stack">
+			<label>Assigned Cross-Stream Classes</label>
+			<span>BCA (Vth Sem) & BBA (IIIrd Sem) <br><small style="color:var(--text-muted)">(Common IT-Management Overlapping Subjects)</small></span>
+		</div>
+	</div>
+
+	<!-- 📋 Top Navbar Area -->
+	<div class="top-bar">
+		<button class="menu-trigger" onclick="toggleSidebar()">⋮</button>
+		<div style="font-weight: 700; font-size: 18px; color: var(--accent-prof)">DPG ERP Node</div>
+		<button class="logout-btn" onclick="handleLogout()">Exit Terminal</button>
+	</div>
+
+	<!-- 📑 Main Dashboard Grid Workspace -->
+	<div class="dashboard-container">
+        
+		<div class="welcome-section">
+			<h1 id="welcomeGreeting">👨‍🏫 Welcome Professor</h1>
+			<p style="color: var(--text-muted); font-size: 14px; margin-top: 5px;">Academic Command Node & Record Matrix Engine</p>
+		</div>
+
+		<div class="control-grid">
+            
+			<!-- ⚡ CENTRAL MARKS & ATTENDANCE RECORD SYSTEM -->
+			<div class="matrix-card">
+				<h2>📊 Live Student Scholar Matrix</h2>
+                
+				<!-- Filters for Stream / Overlapping Classes -->
+				<div class="filter-row">
+					<select id="classFilter" onchange="filterClassData()">
+						<option value="BCA">BCA (Vth Sem) - Python Automation</option>
+						<option value="BBA">BBA (IIIrd Sem) - Advanced DBMS</option>
+					</select>
+					<input type="text" id="studentSearch" placeholder="Search Scholar Name/Roll No..." onkeyup="searchStudents()">
+				</div>
+
+				<!-- Interactive Data Table Matrix -->
+				<div class="table-wrapper">
+					<table>
+						<thead>
+							<tr>
+								<th>Roll No</th>
+								<th>Scholar Name</th>
+								<th>Attendance Status</th>
+								<th>Internal Marks (Max 20)</th>
+								<th>Practical Marks (Max 30)</th>
+							</tr>
+						</thead>
+						<tbody id="studentTableBody">
+							<!-- Rows will be dynamically loaded via script inside loop -->
+						</tbody>
+					</table>
+				</div>
+
+				<button class="action-btn" onclick="saveAcademicRecords()">Commit Data Changes to Mainframe</button>
+			</div>
+
+		</div>
+	</div>
+
+	<!-- ⚙️ Back-end Logic Control Script -->
+	<script>
+		// Check Authentication Guard
+		if (localStorage.getItem("isLoggedIn") !== "true" || localStorage.getItem("userRole") !== "professor") {
+			window.location.href = "login.html";
+		}
+
+		// Toggle Function for Left Three-Dot Sidebar Profile Drawer
+		function toggleSidebar() {
+			const sidebar = document.getElementById("profileSidebar");
+			const overlay = document.getElementById("overlay");
+			sidebar.classList.toggle("open");
+			overlay.classList.toggle("active");
+		}
+
+		// Mock Database Object comprising Students across BCA & BBA overlapping zones
+		const studentDatabase = {
+			BCA: [
+				{ roll: "BCA-501", name: "Aman Verma", present: true, internal: 18, practical: 28 },
+				{ roll: "BCA-502", name: "Rahul Yadav", present: true, internal: 15, practical: 24 },
+				{ roll: "BCA-503", name: "Priya Sharma", present: false, internal: 19, practical: 29 },
+				{ roll: "BCA-504", name: "Vikram Malhotra", present: true, internal: 12, practical: 20 }
+			],
+			BBA: [
+				{ roll: "BBA-301", name: "Sneha Goel", present: true, internal: 17, practical: 26 },
+				{ roll: "BBA-302", name: "Kartik Mehta", present: false, internal: 14, practical: 22 },
+				{ roll: "BBA-303", name: "Rohan Kapoor", present: true, internal: 16, practical: 25 }
+			]
+		};
+
+		// Render Student data based on class filter
+		function loadStudentMatrix(stream) {
+			const tbody = document.getElementById("studentTableBody");
+			tbody.innerHTML = "";
+            
+			const list = studentDatabase[stream];
+			list.forEach((student, index) => {
+				tbody.innerHTML += `
+					<tr class="student-row">
+						<td style="font-weight:700; color:#cbd5e1;">${student.roll}</td>
+						<td>${student.name}</td>
+						<td>
+							<input type="checkbox" id="att-${stream}-${index}" ${student.present ? 'checked' : ''}>
+							<label style="margin-left: 5px;">${student.present ? 'Present' : 'Absent'}</label>
+						</td>
+						<td>
+							<input type="number" class="input-score" id="int-${stream}-${index}" value="${student.internal}" min="0" max="20">
+						</td>
+						<td>
+							<input type="number" class="input-score" id="prac-${stream}-${index}" value="${student.practical}" min="0" max="30">
+						</td>
+					</tr>
+				`;
+			});
+		}
+
+		function filterClassData() {
+			const selectedClass = document.getElementById("classFilter").value;
+			loadStudentMatrix(selectedClass);
+		}
+
+		// Search algorithm filtering rows inside viewport
+		function searchStudents() {
+			const query = document.getElementById("studentSearch").value.toLowerCase();
+			const rows = document.querySelectorAll(".student-row");
+            
+			rows.forEach(row => {
+				const text = row.innerText.toLowerCase();
+				row.style.display = text.includes(query) ? "" : "none";
+			});
+		}
+
+		// Trigger on save changes
+		function saveAcademicRecords() {
+			alert("Mainframe Updated Successfully: Attendance locks synchronized and marks uploaded to central server.");
+		}
+
+		function handleLogout() {
+			localStorage.clear();
+			window.location.href = "index.html";
+		}
+
+		// Initialize viewport data bindings
+		document.addEventListener("DOMContentLoaded", () => {
+			loadStudentMatrix("BCA");
+		});
+	</script>
+</body>
+</html>
