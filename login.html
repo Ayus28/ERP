@@ -1,213 +1,313 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Academic Portal | Secured Login</title>
-    <style>
-        /* Premium Typography & Variable Setup */
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Academic Portal | Secured Login</title>
+	<style>
+		@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
         
-        :root {
-            --primary: #4f46e5;
-            --primary-hover: #4338ca;
-            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #311042 100%);
-            --card-bg: rgba(255, 255, 255, 0.03);
-            --card-border: rgba(255, 255, 255, 0.08);
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-        }
+		:root {
+			--primary: #4f46e5;
+			--primary-hover: #4338ca;
+			--bg-dark: #0f172a;
+			--card-bg: rgba(255, 255, 255, 0.03);
+			--card-border: rgba(255, 255, 255, 0.08);
+			--text-main: #f8fafc;
+			--text-muted: #94a3b8;
+		}
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-        }
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+			font-family: 'Plus Jakarta Sans', sans-serif;
+		}
 
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background: var(--bg-gradient);
-            overflow: hidden;
-            position: relative;
-        }
+		body {
+			min-height: 100vh;
+			background-color: var(--bg-dark);
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			overflow-x: hidden;
+			position: relative;
+		}
 
-        /* Ambient Glow Background Spheres */
-        body::before, body::after {
-            content: '';
-            position: absolute;
-            width: 400px;
-            height: 400px;
-            border-radius: 50%;
-            background: rgba(99, 102, 241, 0.15);
-            filter: blur(100px);
-            z-index: 0;
-        }
-        body::before { top: -10%; left: -10%; background: rgba(168, 85, 247, 0.15); }
-        body::after { bottom: -10%; right: -10%; }
+		/* Master Container for Split Screen */
+		.page-container {
+			display: flex;
+			width: 100%;
+			min-height: 100vh;
+			position: relative;
+			z-index: 10;
+		}
 
-        /* Glassmorphism Login Container */
-        .login-wrapper {
-            position: relative;
-            z-index: 10;
-            width: 100%;
-            max-width: 420px;
-            padding: 20px;
-        }
+		/* Left Side: Dynamic Student Photo Grid Section */
+		.photo-grid-side {
+			flex: 1.2;
+			display: grid;
+			grid-template-columns: repeat(3, 1fr);
+			grid-template-rows: repeat(2, 1fr);
+			gap: 15px;
+			padding: 20px;
+			background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 27, 75, 0.9));
+			position: relative;
+		}
 
-        .login-card {
-            background: var(--card-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--card-border);
-            padding: 40px 35px;
-            border-radius: 24px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
-            animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-        }
+		/* Hide photos section on small mobile screens to keep it responsive */
+		@media (max-width: 900px) {
+			.photo-grid-side {
+				display: none;
+			}
+		}
 
-        .login-header {
-            text-align: center;
-            margin-bottom: 35px;
-        }
+		.grid-img-card {
+			width: 100%;
+			height: 100%;
+			object-fit: cover;
+			border-radius: 16px;
+			opacity: 0.7;
+			border: 1px solid rgba(255, 255, 255, 0.05);
+			transition: all 0.4s ease;
+		}
 
-        .login-header h2 {
-            color: var(--text-main);
-            font-size: 28px;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-            margin-bottom: 8px;
-        }
+		.grid-img-card:hover {
+			opacity: 1;
+			transform: scale(1.02);
+			border-color: #38bdf8;
+			box-shadow: 0 10px 20px rgba(56, 189, 248, 0.2);
+		}
 
-        .login-header p {
-            color: var(--text-muted);
-            font-size: 14px;
-        }
+		/* Right Side: Center Aligned Login Space */
+		.login-side {
+			flex: 1;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			padding: 40px 20px;
+			background: linear-gradient(135deg, #0f172a 0%, #111827 100%);
+			position: relative;
+		}
 
-        .form-group {
-            margin-bottom: 24px;
-            position: relative;
-        }
+		.login-card {
+			background: var(--card-bg);
+			backdrop-filter: blur(20px);
+			-webkit-backdrop-filter: blur(20px);
+			border: 1px solid var(--card-border);
+			padding: 40px 35px;
+			border-radius: 24px;
+			box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+			width: 100%;
+			max-width: 400px;
+			animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+		}
 
-        .form-group label {
-            display: block;
-            color: #cbd5e1;
-            font-size: 13px;
-            font-weight: 600;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
+		.login-header {
+			text-align: center;
+			margin-bottom: 30px;
+		}
 
-        /* High-Tech Input Shells */
-        select, input {
-            width: 100%;
-            padding: 14px 16px;
-            background: rgba(15, 23, 42, 0.6);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            font-size: 15px;
-            color: var(--text-main);
-            outline: none;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-        }
+		.avatar-container {
+			width: 90px;
+			height: 90px;
+			margin: 0 auto 20px auto;
+			border-radius: 50%;
+			border: 2px solid rgba(255, 255, 255, 0.1);
+			background: rgba(15, 23, 42, 0.6);
+			overflow: hidden;
+			box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+			display: flex;
+			justify-content: center;
+			align-items: center;
+		}
 
-        /* Style Select Options for dark background consistency */
-        select option {
-            background-color: #1e1b4b;
-            color: var(--text-main);
-        }
+		.avatar-img {
+			width: 100%;
+			height: 100%;
+			object-fit: cover;
+		}
 
-        select:focus, input:focus {
-            border-color: #818cf8;
-            background: rgba(15, 23, 42, 0.8);
-            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2);
-        }
+		.login-header h2 {
+			color: var(--text-main);
+			font-size: 26px;
+			font-weight: 700;
+			letter-spacing: -0.5px;
+			margin-bottom: 8px;
+		}
 
-        /* Futuristic Action Button */
-        .login-btn {
-            width: 100%;
-            padding: 15px;
-            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
-            color: #ffffff;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            box-shadow: 0 4px 20px rgba(79, 70, 229, 0.4);
-            transition: all 0.2s ease;
-            margin-top: 10px;
-        }
+		.login-header p {
+			color: var(--text-muted);
+			font-size: 14px;
+		}
 
-        .login-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 24px rgba(79, 70, 229, 0.5);
-            background: linear-gradient(135deg, #818cf8 0%, #4338ca 100%);
-        }
+		.form-group {
+			margin-bottom: 24px;
+		}
 
-        .login-btn:active {
-            transform: translateY(0);
-        }
+		.form-group label {
+			display: block;
+			color: #cbd5e1;
+			font-size: 13px;
+			font-weight: 600;
+			margin-bottom: 8px;
+			text-transform: uppercase;
+			letter-spacing: 0.5px;
+		}
 
-        /* Entrance Animation CSS */
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-    </style>
+		select, input {
+			width: 100%;
+			padding: 14px 16px;
+			background: rgba(15, 23, 42, 0.6);
+			border: 1px solid rgba(255, 255, 255, 0.1);
+			border-radius: 12px;
+			font-size: 15px;
+			color: var(--text-main);
+			outline: none;
+			transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+		}
+
+		select:disabled {
+			opacity: 0.85;
+			cursor: not-allowed;
+			background: rgba(15, 23, 42, 0.8);
+		}
+
+		select option {
+			background-color: #1e1b4b;
+			color: var(--text-main);
+		}
+
+		select:focus, input:focus {
+			border-color: #818cf8;
+			background: rgba(15, 23, 42, 0.8);
+			box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2);
+		}
+
+		.login-btn {
+			width: 100%;
+			padding: 15px;
+			background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+			color: #ffffff;
+			border: none;
+			border-radius: 12px;
+			font-size: 16px;
+			font-weight: 600;
+			cursor: pointer;
+			box-shadow: 0 4px 20px rgba(79, 70, 229, 0.4);
+			transition: all 0.2s ease;
+			margin-top: 10px;
+		}
+
+		.login-btn:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 6px 24px rgba(79, 70, 229, 0.5);
+			background: linear-gradient(135deg, #818cf8 0%, #4338ca 100%);
+		}
+
+		@keyframes fadeIn {
+			from { opacity: 0; transform: translateY(20px); }
+			to { opacity: 1; transform: translateY(0); }
+		}
+	</style>
 </head>
 <body>
 
-<div class="login-wrapper">
-    <div class="login-card">
-        <div class="login-header">
-            <h2>Portal Secure SignIn</h2>
-            <p>Access your academic analytics core terminal</p>
-        </div>
+<div class="page-container">
 
-        <div class="form-group">
-            <label for="role">User Configuration Profile</label>
-            <select id="role">
-                <option value="professor">👨‍🏫 Faculty Member / Professor</option>
-                <option value="student">👨‍🎓 Academic Scholar / Student</option>
-            </select>
-        </div>
+	<div class="photo-grid-side" id="photoGridSide">
+		<img class="grid-img-card" src="s1.jpg" onerror="this.src='https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=400'">
+		<img class="grid-img-card" src="s2.jpg" onerror="this.src='https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=400'">
+		<img class="grid-img-card" src="s3.jpg" onerror="this.src='https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=400'">
+		<img class="grid-img-card" src="s4.jpg" onerror="this.src='https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?q=80&w=400'">
+		<img class="grid-img-card" src="s5.jpg" onerror="this.src='https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=400'">
+		<img class="grid-img-card" src="s6.jpg" onerror="this.src='https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=400'">
+	</div>
 
-        <div class="form-group">
-            <label for="password">Security Access Token</label>
-            <input type="password" id="password" placeholder="••••••••" required>
-        </div>
+	<div class="login-side">
+		<div class="login-card">
+			<div class="login-header">
+				<div class="avatar-container">
+					<img id="portalAvatar" src="" alt="Portal User Avatar" class="avatar-img">
+				</div>
+				<h2 id="portalTitle">Portal Secure SignIn</h2>
+				<p>Access your academic analytics core terminal</p>
+			</div>
 
-        <button onclick="handleLogin()" class="login-btn">Authenticate Session</button>
-    </div>
+			<div class="form-group">
+				<label for="role">User Configuration Profile</label>
+				<select id="role">
+					<option value="professor" id="opt-prof">👨‍🏫 Faculty Member / Professor</option>
+					<option value="student" id="opt-stud">👨‍🎓 Academic Scholar / Student</option>
+				</select>
+			</div>
+
+			<div class="form-group">
+				<label for="password">Security Access Token</label>
+				<input type="password" id="password" placeholder="••••••••" required>
+			</div>
+
+			<button onclick="handleLogin()" class="login-btn">Authenticate Session</button>
+		</div>
+	</div>
+
 </div>
 
 <script>
-function handleLogin() {
-    const role = document.getElementById("role").value;
-    const password = document.getElementById("password").value;
+document.addEventListener("DOMContentLoaded", () => {
+	const urlParams = new URLSearchParams(window.location.search);
+	const roleParam = urlParams.get('role'); 
+    
+	const roleDropdown = document.getElementById("role");
+	const portalTitle = document.getElementById("portalTitle");
+	const portalAvatar = document.getElementById("portalAvatar");
+	const optProf = document.getElementById("opt-prof");
+	const optStud = document.getElementById("opt-stud");
+	const photoGridSide = document.getElementById("photoGridSide");
 
-    if (role === "professor" && password === "admin123") {
-        localStorage.setItem("isLoggedIn", "true");
-        localStorage.setItem("userRole", "professor");
-        window.location.href = "professor.html"; // Ye file sahi folder mein honi chahiye
-    } else if (role === "student" && password === "student123") {
-        localStorage.setItem("isLoggedIn", "true");
-        localStorage.setItem("userRole", "student");
-        window.location.href = "student.html";   // Ye file sahi folder mein honi chahiye
-    } else {
-        alert("Authentication Terminated: Invalid Access Credentials.");
-    }
+	if (roleParam === "professor") {
+		roleDropdown.value = "professor";
+		optStud.remove(); // ❌ Student option hatao
+		roleDropdown.disabled = true; 
+		portalTitle.innerText = "Faculty Login"; 
+        
+		// Hide photo grid for faculty side to keep it ultra formal, or keep it consistent
+		photoGridSide.style.background = "linear-gradient(135deg, #0f172a, #311042)";
+        
+		portalAvatar.src = "professor.jpg";
+		portalAvatar.onerror = function() {
+			this.src = "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=150";
+		};
+	} 
+	else if (roleParam === "student") {
+		roleDropdown.value = "student";
+		optProf.remove(); // ❌ Professor option hatao (Sirf student bacha)
+		roleDropdown.disabled = true; 
+		portalTitle.innerText = "Student Login"; 
+        
+		portalAvatar.src = "student.jpg";
+		portalAvatar.onerror = function() {
+			this.src = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=150";
+		};
+	}
+});
+
+function handleLogin() {
+	const roleDropdown = document.getElementById("role");
+	const role = roleDropdown.value;
+	const password = document.getElementById("password").value;
+
+	if (role === "professor" && password === "admin123") {
+		localStorage.setItem("isLoggedIn", "true");
+		localStorage.setItem("userRole", "professor");
+		window.location.href = "professor.html"; 
+	} else if (role === "student" && password === "student123") {
+		localStorage.setItem("isLoggedIn", "true");
+		localStorage.setItem("userRole", "student");
+		window.location.href = "student.html"; 
+	} else {
+		alert("Authentication Terminated: Invalid Access Credentials.");
+	}
 }
 </script>
 
