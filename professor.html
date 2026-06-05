@@ -1,457 +1,604 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Faculty Matrix Center | DPG</title>
-	<style>
-		@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DPG ERP - Advanced Faculty Portal</title>
+    <style>
+        /* ==================== SYSTEM DESIGN TOKENS ==================== */
+        :root {
+            --bg-base-mainframe: #070a13;
+            --bg-card-surface: #0f172a;
+            --panel-gradient-start: #0e1626;
+            --panel-gradient-end: #1a163a;
+            --accent-indigo-glow: #6366f1;
+            --accent-indigo-hover: #4f46e5;
+            --text-primary-white: #f8fafc;
+            --text-muted-slate: #94a3b8;
+            --border-glass-line: rgba(255, 255, 255, 0.08);
+            --error-red: #ef4444;
+            --success-green: #10b981;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-base-mainframe);
+            color: var(--text-primary-white);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        /* ==================== SCREEN 1: FACULTY AUTH GATEWAY ==================== */
+        .login-card-viewport {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            border: 1px solid var(--border-glass-line);
+            border-radius: 16px;
+            padding: 40px;
+            width: 390px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        .login-card-viewport h2 { margin: 0 0 8px 0; font-size: 24px; font-weight: 700; }
+        .login-card-viewport p { color: var(--text-muted-slate); font-size: 13px; margin: 0 0 24px 0; }
+
+        .input-control-block { text-align: left; margin-bottom: 18px; }
+        .input-control-block label { display: block; font-size: 11px; color: var(--text-muted-slate); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
         
-		:root {
-			--bg-dark: #0f172a;
-			--card-bg: rgba(255, 255, 255, 0.02);
-			--card-border: rgba(255, 255, 255, 0.08);
-			--text-main: #f8fafc;
-			--text-muted: #94a3b8;
-			--accent-prof: #a855f7;
-			--accent-blue: #38bdf8;
-		}
+        .form-input-field {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--border-glass-line);
+            padding: 12px;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        .form-input-field:focus { outline: none; border-color: var(--accent-indigo-glow); }
 
-		* {
-			margin: 0;
-			padding: 0;
-			box-sizing: border-box;
-			font-family: 'Plus Jakarta Sans', sans-serif;
-		}
+        .login-error-log { color: var(--error-red); font-size: 13px; margin-bottom: 15px; display: none; }
 
-		body {
-			background-color: var(--bg-dark);
-			color: var(--text-main);
-			min-height: 100vh;
-			padding: 40px 20px;
-			display: flex;
-			flex-direction: column;
-			align-items: center;
-		}
+        /* ==================== SCREEN 2: MAIN WORKSPACE INTERFACE ==================== */
+        .workspace-wrapper {
+            padding: 30px;
+            max-width: 1300px;
+            width: 100%;
+            margin: 0 auto;
+            box-sizing: border-box;
+            display: none;
+            align-self: flex-start;
+        }
 
-		/* 📋 Top Navbar & Three Dot Trigger */
-		.top-bar {
-			width: 100%;
-			max-width: 1100px;
-			display: flex;
-			justify-content: space-between;
-			align-items: center;
-			margin-bottom: 40px;
-			background: var(--card-bg);
-			border: 1px solid var(--card-border);
-			padding: 15px 25px;
-			border-radius: 16px;
-			backdrop-filter: blur(10px);
-		}
+        .workspace-navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-glass-line);
+            padding-bottom: 18px;
+            margin-bottom: 25px;
+        }
+        .workspace-navbar h2 { margin: 0; font-size: 26px; font-weight: 700; letter-spacing: -0.5px; }
 
-		.menu-trigger {
-			background: rgba(255, 255, 255, 0.05);
-			border: 1px solid var(--card-border);
-			color: var(--text-main);
-			width: 45px;
-			height: 45px;
-			border-radius: 12px;
-			font-size: 22px;
-			cursor: pointer;
-			display: flex;
-			justify-content: center;
-			align-items: center;
-			transition: 0.3s;
-		}
+        .navbar-controls-cluster { display: flex; align-items: center; gap: 12px; }
+        
+        .three-dot-trigger {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-glass-line);
+            color: var(--text-primary-white);
+            padding: 10px 18px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .three-dot-trigger:hover { background: rgba(255, 255, 255, 0.1); border-color: var(--accent-indigo-glow); }
 
-		.menu-trigger:hover {
-			background: var(--accent-prof);
-			box-shadow: 0 0 15px rgba(168, 85, 247, 0.4);
-		}
+        .session-kill-btn {
+            background: transparent; border: none; color: var(--error-red); font-weight: 600; cursor: pointer; font-size: 14px;
+        }
 
-		.logout-btn {
-			background: rgba(239, 68, 68, 0.1);
-			border: 1px solid rgba(239, 68, 68, 0.2);
-			color: #ef4444;
-			padding: 8px 18px;
-			border-radius: 10px;
-			cursor: pointer;
-			font-weight: 600;
-			transition: 0.2s;
-		}
+        /* ==================== DYNAMIC CORE WORKSPACE PAGES ==================== */
+        .default-welcome-node {
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid var(--border-glass-line);
+            border-radius: 12px;
+            padding: 60px 20px;
+            text-align: center;
+            color: var(--text-muted-slate);
+        }
 
-		.logout-btn:hover { background: #ef4444; color: #fff; }
+        .functional-module-view {
+            display: none;
+            background: var(--bg-card-surface);
+            border: 1px solid var(--border-glass-line);
+            border-radius: 12px;
+            padding: 24px;
+            margin-top: 15px;
+        }
 
-		/* 🧑‍🏫 LEFT SIDEBAR: Professor Profile (Hidden by default) */
-		.profile-sidebar {
-			position: fixed;
-			top: 0;
-			left: -350px; /* Hidden state */
-			width: 340px;
-			height: 100vh;
-			background: #0b0f19;
-			border-right: 1px solid var(--card-border);
-			z-index: 100;
-			padding: 40px 30px;
-			box-shadow: 20px 0 50px rgba(0,0,0,0.8);
-			transition: left 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-			overflow-y: auto;
-		}
+        /* Filter Controls Matrix Layout Line */
+        .filter-ribbon-dock {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 14px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+        }
 
-		.profile-sidebar.open {
-			left: 0; /* Visible state */
-		}
+        /* Semester Selector Component */
+        .semester-scroller-node {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: rgba(0,0,0,0.3);
+            padding: 6px 14px;
+            border-radius: 6px;
+            border: 1px solid var(--border-glass-line);
+        }
+        .semester-arrow-btn {
+            background: transparent;
+            border: none;
+            color: var(--accent-indigo-glow);
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            user-select: none;
+            transition: transform 0.1s;
+        }
+        .semester-arrow-btn:active { transform: scale(0.85); }
+        .semester-display-label { font-weight: 600; font-size: 14px; min-width: 110px; text-align: center; color: var(--text-primary-white); }
 
-		.close-sidebar {
-			position: absolute;
-			top: 20px;
-			right: 20px;
-			background: none;
-			border: none;
-			color: var(--text-muted);
-			font-size: 24px;
-			cursor: pointer;
-		}
+        /* Calendar Config */
+        .date-picker-input {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--border-glass-line);
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 6px;
+            outline: none;
+            font-family: inherit;
+        }
 
-		.prof-avatar-big {
-			width: 110px;
-			height: 110px;
-			border-radius: 50%;
-			border: 3px solid var(--accent-prof);
-			margin: 20px auto;
-			display: block;
-			object-fit: cover;
-		}
+        /* ==================== STRUCTURAL DATAGRIDS ==================== */
+        .grid-scroll-limiter {
+            max-height: 480px;
+            overflow-y: auto;
+            border: 1px solid var(--border-glass-line);
+            border-radius: 8px;
+            background: rgba(0,0,0,0.15);
+            margin-bottom: 20px;
+        }
+        .erp-tabular-grid { width: 100%; border-collapse: collapse; text-align: left; }
+        .erp-tabular-grid th {
+            background: #1e293b; color: var(--text-muted-slate); font-size: 12px; font-weight: 600; text-transform: uppercase; padding: 12px 16px; position: sticky; top: 0; z-index: 10; border-bottom: 1px solid var(--border-glass-line);
+        }
+        .erp-tabular-grid td { padding: 12px 16px; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.03); color: var(--text-primary-white); }
+        .erp-tabular-grid tr:hover { background: rgba(255,255,255,0.01); }
 
-		.sidebar-title {
-			text-align: center;
-			margin-bottom: 30px;
-		}
+        .score-entry-field {
+            width: 75px; background: rgba(0,0,0,0.4); border: 1px solid var(--border-glass-line); color: #fff; padding: 6px; border-radius: 4px; text-align: center;
+        }
+        .score-entry-field:focus { outline: none; border-color: var(--accent-indigo-glow); }
 
-		.sidebar-title h3 { font-size: 22px; color: #fff; }
-		.sidebar-title p { color: var(--accent-prof); font-weight: 600; font-size: 13px; }
+        .action-commit-btn {
+            background: var(--accent-indigo-glow); border: none; color: #fff; padding: 12px 24px; border-radius: 6px; font-weight: 600; cursor: pointer; transition: background 0.2s;
+        }
+        .action-commit-btn:hover { background: var(--accent-indigo-hover); }
 
-		.info-stack {
-			margin-bottom: 20px;
-			background: rgba(255,255,255,0.02);
-			padding: 12px 15px;
-			border-radius: 12px;
-			border: 1px solid rgba(255,255,255,0.04);
-		}
+        /* ==================== THREE-DOT CONTROL DRAWER ==================== */
+        .three-dot-drawer-panel {
+            position: fixed; top: 0; right: -460px; width: 420px; height: 100vh;
+            background: linear-gradient(135deg, var(--panel-gradient-start) 0%, var(--panel-gradient-end) 100%);
+            border-left: 1px solid var(--border-glass-line);
+            box-shadow: -15px 0 40px rgba(0,0,0,0.6);
+            transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1000; padding: 26px; box-sizing: border-box; display: flex; flex-direction: column;
+        }
+        .three-dot-drawer-panel.is-expanded { right: 0; }
 
-		.info-stack label {
-			display: block;
-			font-size: 11px;
-			color: var(--text-muted);
-			text-transform: uppercase;
-			letter-spacing: 0.5px;
-			margin-bottom: 4px;
-		}
+        .drawer-header-cluster { display: flex; align-items: center; justify-content: space-between; padding-bottom: 20px; border-bottom: 1px solid var(--border-glass-line); }
+        .drawer-header-cluster h3 { margin: 0; font-size: 18px; color: var(--text-primary-white); }
+        .drawer-kill-btn { background: transparent; border: none; color: var(--text-muted-slate); font-size: 26px; cursor: pointer; }
 
-		.info-stack span {
-			font-size: 14px;
-			color: var(--text-main);
-			font-weight: 500;
-		}
+        /* Faculty Profile Card Block */
+        .faculty-profile-card {
+            background: rgba(0, 0, 0, 0.25); border: 1px solid var(--border-glass-line); border-radius: 12px; padding: 20px; margin-top: 20px; text-align: center;
+        }
+        .faculty-avatar-frame {
+            width: 90px; height: 90px; border-radius: 50%; border: 2px solid var(--accent-indigo-glow); margin: 0 auto 12px auto; background-color: #1e293b; display: flex; justify-content: center; align-items: center; font-size: 40px; overflow: hidden; box-shadow: 0 0 15px rgba(99, 102, 241, 0.2);
+        }
+        .faculty-avatar-frame img { width: 100%; height: 100%; object-fit: cover; }
+        .profile-title-name { margin: 0; font-size: 18px; font-weight: 600; color: var(--text-primary-white); }
+        .profile-meta-line { margin: 4px 0 0 0; font-size: 12px; color: var(--text-muted-slate); text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        .profile-detailed-spec-table { width: 100%; margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 12px; text-align: left; }
+        .profile-detailed-spec-table div { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 6px; }
+        .profile-detailed-spec-table span.label { color: var(--text-muted-slate); }
+        .profile-detailed-spec-table span.val { color: var(--text-primary-white); font-weight: 500; }
 
-		/* 📑 Main Dashboard Layout */
-		.dashboard-container {
-			width: 100%;
-			max-width: 1100px;
-		}
+        /* Drawer Internal Action Links */
+        .drawer-navigation-stack { margin-top: 30px; display: flex; flex-direction: column; gap: 10px; }
+        .drawer-action-link-btn {
+            background: rgba(255,255,255,0.03); border: 1px solid var(--border-glass-line); color: var(--text-primary-white); padding: 14px; text-align: left; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.2s; display: flex; justify-content: space-between; align-items: center;
+        }
+        .drawer-action-link-btn:hover { background: var(--accent-indigo-glow); border-color: transparent; }
 
-		.welcome-section {
-			margin-bottom: 35px;
-		}
-
-		.welcome-section h1 { font-size: 32px; font-weight: 800; color: #fff; }
-
-		/* ⚡ ERP Core Control Panel Grid */
-		.control-grid {
-			display: grid;
-			grid-template-columns: 1fr;
-			gap: 30px;
-		}
-
-		.matrix-card {
-			background: var(--card-bg);
-			border: 1px solid var(--card-border);
-			border-radius: 20px;
-			padding: 30px;
-			backdrop-filter: blur(10px);
-		}
-
-		.matrix-card h2 {
-			font-size: 20px;
-			margin-bottom: 20px;
-			color: var(--accent-blue);
-			display: flex;
-			align-items: center;
-			gap: 10px;
-		}
-
-		/* Data Controls (Class Filter & Search) */
-		.filter-row {
-			display: flex;
-			gap: 15px;
-			margin-bottom: 20px;
-			flex-wrap: wrap;
-		}
-
-		select, input {
-			background: rgba(15, 23, 42, 0.6);
-			border: 1px solid rgba(255, 255, 255, 0.1);
-			color: #fff;
-			padding: 10px 15px;
-			border-radius: 10px;
-			outline: none;
-			font-size: 14px;
-		}
-
-		select option { background-color: #0f172a; }
-
-		/* Custom Responsive Table Matrix */
-		.table-wrapper {
-			overflow-x: auto;
-			width: 100%;
-		}
-
-		table {
-			width: 100%;
-			border-collapse: collapse;
-			text-align: left;
-			font-size: 14px;
-		}
-
-		th {
-			background: rgba(255, 255, 255, 0.04);
-			padding: 12px 15px;
-			color: var(--text-muted);
-			font-weight: 600;
-			border-bottom: 1px solid var(--card-border);
-		}
-
-		td {
-			padding: 14px 15px;
-			border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-		}
-
-		.input-score {
-			width: 70px;
-			padding: 6px;
-			text-align: center;
-		}
-
-		/* Attendance Checkbox Switch styling */
-		.checkbox-container {
-			display: inline-block;
-			position: relative;
-			cursor: pointer;
-		}
-
-		/* Save Button */
-		.action-btn {
-			background: var(--accent-blue);
-			border: none;
-			color: #fff;
-			padding: 12px 24px;
-			border-radius: 10px;
-			cursor: pointer;
-			font-weight: 600;
-			margin-top: 20px;
-			transition: 0.2s;
-		}
-		.action-btn:hover { background: #0284c7; }
-
-		/* Overlay Background when sidebar is open */
-		.sidebar-overlay {
-			display: none;
-			position: fixed;
-			top: 0; left: 0; width: 100vw; height: 100vh;
-			background: rgba(0,0,0,0.5);
-			z-index: 99;
-			backdrop-filter: blur(4px);
-		}
-		.sidebar-overlay.active { display: block; }
-	</style>
+        .blur-overlay-mask { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 999; display: none; }
+    </style>
 </head>
 <body>
 
-	<!-- Overlay back shadow -->
-	<div class="sidebar-overlay" id="overlay" onclick="toggleSidebar()"></div>
+<!-- ==================== SCREEN 1: PORTAL AUTH GATEWAY ==================== -->
+<div id="portalAuthGatewayNode" class="login-card-viewport">
+    <h2>Faculty Hub Login</h2>
+    <p>DPG Degree College ERP Node Matrix</p>
+    
+    <div id="authValidationLog" class="login-error-log">Invalid Username or Security Token!</div>
+    
+    <div class="input-control-block">
+        <label>Faculty Identity Name</label>
+        <input type="text" id="facultyIdField" class="form-input-field" placeholder="e.g., Rajesh">
+    </div>
+    
+    <div class="input-control-block">
+        <label>Security Key (Password)</label>
+        <input type="password" id="facultySecretField" class="form-input-field" placeholder="e.g., Rajesh123">
+    </div>
+    
+    <button class="action-commit-btn" style="width: 100%; margin-top: 10px;" onclick="verifyFacultySessionAuth()">Authorize Credentials</button>
+</div>
 
-	<!-- 🧑‍🏫 LEFT SIDEBAR PANEL: Professor Profile Details -->
-	<div class="profile-sidebar" id="profileSidebar">
-		<button class="close-sidebar" onclick="toggleSidebar()">×</button>
-		<img class="prof-avatar-big" src="professor.jpg" onerror="this.src='https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=200'">
-		<div class="sidebar-title">
-			<h3 id="profName">Dr. Anjali Sharma</h3>
-			<p id="profId">FACULTY ID: #DPG-2026-88</p>
-		</div>
+<!-- ==================== SCREEN 2: SYSTEM MANAGEMENT DESKTOP VIEWPORT ==================== -->
+<div id="portalMainWorkspaceView" class="workspace-wrapper">
+    <header class="workspace-navbar">
+        <div>
+            <h2 id="dynamicWelcomeBanner">Welcome, Faculty Console Node</h2>
+        </div>
+        <div class="navbar-controls-cluster">
+            <button class="three-dot-trigger" onclick="toggleControlDrawerConsole(true)">⋮ Center Controls</button>
+            <button class="session-kill-btn" onclick="terminateActiveSession()">Logout</button>
+        </div>
+    </header>
 
-		<div class="info-stack">
-			<label>Education / Degree</label>
-			<span>Ph.D in Computer Science, M.Tech (IIT Delhi)</span>
-		</div>
-		<div class="info-stack">
-			<label>Contact Number</label>
-			<span>+91 98765 43210</span>
-		</div>
-		<div class="info-stack">
-			<label>Official Address</label>
-			<span>Block-C, Faculty Chambers, DPG Degree College, Gurugram</span>
-		</div>
-		<div class="info-stack">
-			<label>Core Subjects Specialize</label>
-			<!-- Single subject targeting overlapping modules across streams -->
-			<span>Data Structures, Python Automation & Advanced DBMS</span>
-		</div>
-		<div class="info-stack">
-			<label>Assigned Cross-Stream Classes</label>
-			<span>BCA (Vth Sem) & BBA (IIIrd Sem) <br><small style="color:var(--text-muted)">(Common IT-Management Overlapping Subjects)</small></span>
-		</div>
-	</div>
+    <!-- DEFAULT SPLASH ENTRY PAGE VIEW -->
+    <div id="defaultDashboardSplash" class="default-welcome-node">
+        <h3>Institutional Framework Initialized.</h3>
+        <p>Please click on the <strong>"⋮ Center Controls"</strong> button to view your custom profile, then select your operation target module.</p>
+    </div>
 
-	<!-- 📋 Top Navbar Area -->
-	<div class="top-bar">
-		<button class="menu-trigger" onclick="toggleSidebar()">⋮</button>
-		<div style="font-weight: 700; font-size: 18px; color: var(--accent-prof)">DPG ERP Node</div>
-		<button class="logout-btn" onclick="handleLogout()">Exit Terminal</button>
-	</div>
+    <!-- MODULE BLOCK A: DYNAMIC ATTENDANCE INTERFACE LINK -->
+    <div id="workspaceModuleAttendance" class="functional-module-view">
+        <div class="filter-ribbon-dock">
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+                <span style="font-size: 11px; color: var(--text-muted-slate); text-transform: uppercase;">Active Class Loop</span>
+                <div class="semester-scroller-node">
+                    <button class="semester-arrow-btn" onclick="cycleSemesterTarget('attendance', -1)">◀</button>
+                    <span id="attendanceSemLabel" class="semester-display-label">Semester: 2</span>
+                    <button class="semester-arrow-btn" onclick="cycleSemesterTarget('attendance', 1)">▶</button>
+                </div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 4px; text-align: right;">
+                <span style="font-size: 11px; color: var(--text-muted-slate); text-transform: uppercase;">Calendar Index/Day</span>
+                <input type="date" id="attendanceDatePicker" class="date-picker-input">
+            </div>
+        </div>
 
-	<!-- 📑 Main Dashboard Grid Workspace -->
-	<div class="dashboard-container">
+        <div class="grid-scroll-limiter">
+            <table class="erp-tabular-grid" id="attendanceGridDataEngine">
+                <!-- Executed dynamically via standard arrays -->
+            </table>
+        </div>
+        <button class="action-commit-btn" onclick="saveAttendanceMatrixToStorage()">Lock & Sync Daily Attendance</button>
+    </div>
+
+    <!-- MODULE BLOCK B: UNIFIED EVALUATION MATRIX LINK (INTERNAL + SESSIONAL) -->
+    <div id="workspaceModuleMarks" class="functional-module-view">
+        <div class="filter-ribbon-dock">
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+                <span style="font-size: 11px; color: var(--text-muted-slate); text-transform: uppercase;">Active Grading Loop</span>
+                <div class="semester-scroller-node">
+                    <button class="semester-arrow-btn" onclick="cycleSemesterTarget('marks', -1)">◀</button>
+                    <span id="marksSemLabel" class="semester-display-label">Semester: 2</span>
+                    <button class="semester-arrow-btn" onclick="cycleSemesterTarget('marks', 1)">▶</button>
+                </div>
+            </div>
+            <span style="font-size: 13px; color: var(--text-muted-slate);" id="marksBranchSubtext">Branch Context: Dynamic</span>
+        </div>
+
+        <div class="grid-scroll-limiter">
+            <table class="erp-tabular-grid" id="marksGridDataEngine">
+                <!-- Integrated dynamically via JS loop matching specifications -->
+            </table>
+        </div>
+        <button class="action-commit-btn" onclick="saveGradesMatrixToStorage()">Commit Consolidated Scores</button>
+    </div>
+</div>
+
+<!-- ==================== THREE-DOT CORE CONTROL CENTER DRAWER ==================== -->
+<div id="threeDotControlDrawer" class="three-dot-drawer-panel">
+    <div class="drawer-header-cluster">
+        <h3>Professor Identity Terminal</h3>
+        <button class="drawer-kill-btn" onclick="toggleControlDrawerConsole(false)">×</button>
+    </div>
+
+    <!-- Dynamic Context Faculty Profile Card Cardboard Container -->
+    <div class="faculty-profile-card">
+        <!-- Structural Image Frame Placeholder Integration -->
+        <div class="faculty-avatar-frame" id="profAvatarFrame">👤</div>
+        <h4 id="profCardName" class="profile-title-name">Professor Node</h4>
+        <p id="profCardPost" class="profile-meta-line">Senior Faculty</p>
         
-		<div class="welcome-section">
-			<h1 id="welcomeGreeting">👨‍🏫 Welcome Professor</h1>
-			<p style="color: var(--text-muted); font-size: 14px; margin-top: 5px;">Academic Command Node & Record Matrix Engine</p>
-		</div>
+        <div class="profile-detailed-spec-table">
+            <div><span class="label">Department:</span><span class="val" id="profCardDept">Computer Applications</span></div>
+            <div><span class="label">Employee ID:</span><span class="val" id="profCardEmpId">DPG-FAC-992</span></div>
+            <div><span class="label">Verification status:</span><span class="val" style="color: var(--success-green);">● Active Session</span></div>
+        </div>
+    </div>
 
-		<div class="control-grid">
+    <!-- Module Operation Selection Links (Redirects workflow outside to main board) -->
+    <div class="drawer-navigation-stack">
+        <button class="drawer-action-link-btn" onclick="routeWorkspaceContext('attendance')">
+            <span>📅 Launch Attendance System</span> <span>→</span>
+        </button>
+        <button class="drawer-action-link-btn" onclick="routeWorkspaceContext('marks')">
+            <span>📝 Open Evaluation Registry (Internal+Sessional)</span> <span>→</span>
+        </button>
+    </div>
+</div>
+
+<div id="blurOverlayMask" class="blur-overlay-mask" onclick="toggleControlDrawerConsole(false)"></div>
+
+<!-- ==================== RUNTIME LOGIC LOOPS ENGINE ==================== -->
+<script>
+    // 1. Structural Faculty Data Dictionary Array (Features Distinct Branch Layouts & Pictures)
+    const institutionalFacultyRegistry = [
+        { name: "Rajesh", branch: "BCA", post: "Assistant Professor", empId: "DPG-BCA-201", image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80" },
+        { name: "Sunita", branch: "BBA", post: "Associate Professor", empId: "DPG-BBA-305", image: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=150&q=80" },
+        { name: "Amit", branch: "BCA", post: "Head of Department (HOD)", empId: "DPG-BCA-102", image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80" },
+        { name: "Kiran", branch: "BBA", post: "Senior Lecturer", empId: "DPG-BBA-411", image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=150&q=80" }
+    ];
+
+    // Core Active Context Session Tracking State
+    let loggedInFacultyContext = null;
+    let currentSelectedSemesters = { attendance: 2, marks: 2 };
+
+    // 2. Comprehensive 20 Student Registry Framework Generation
+    const rawStudentNames = [
+        "Aman Verma", "Rahul Sharma", "Karan Johar", "Sneha Gupta", "Deepak Kumar",
+        "Pooja Hegde", "Rohan Mehra", "Anjali Singh", "Vikram Rathore", "Kriti Sanon",
+        "Siddharth Malhotra", "Varun Dhawan", "Alia Bhatt", "Ranbir Kapoor", "Arjun Kapoor",
+        "Shraddha Kapoor", "Rajkumar Rao", "Ayushmann Khurrana", "Kartik Aaryan", "Sara Ali Khan"
+    ];
+
+    let erpStudentDatabase = JSON.parse(localStorage.getItem('studentData_v2'));
+    
+    if (!erpStudentDatabase) {
+        erpStudentDatabase = [];
+        for (let i = 1; i <= 20; i++) {
+            erpStudentDatabase.push({
+                rollNumber: `DPG-2026-${100 + i}`,
+                name: rawStudentNames[i-1],
+                present: true,
+                internalMarks: 15,
+                sessionalMarks: 65
+            });
+        }
+        localStorage.setItem('studentData_v2', JSON.stringify(erpStudentDatabase));
+    }
+
+    // Set Default Calendar Input Context to Today's Timestamp Loop
+    document.getElementById('attendanceDatePicker').value = new Date().toISOString().split('T')[0];
+
+    // 3. Auth Session Verification Node Interceptor
+    function verifyFacultySessionAuth() {
+        const inputName = document.getElementById('facultyIdField').value.trim();
+        const inputSecret = document.getElementById('facultySecretField').value.trim();
+        const authErrLog = document.getElementById('authValidationLog');
+
+        const match = institutionalFacultyRegistry.find(p => 
+            p.name.toLowerCase() === inputName.toLowerCase() && 
+            (p.name + "123").toLowerCase() === inputSecret.toLowerCase()
+        );
+
+        if (match) {
+            loggedInFacultyContext = match;
+            authErrLog.style.display = 'none';
+
+            // Swap view boundaries panels states layouts
+            document.getElementById('portalAuthGatewayNode').style.display = 'none';
+            document.getElementById('portalMainWorkspaceView').style.display = 'block';
+            document.body.style.alignItems = 'stretch';
+
+            // Bind contextual variables strings inside layouts structures
+            document.getElementById('dynamicWelcomeBanner').innerText = `Welcome, Prof. ${loggedInFacultyContext.name}`;
             
-			<!-- ⚡ CENTRAL MARKS & ATTENDANCE RECORD SYSTEM -->
-			<div class="matrix-card">
-				<h2>📊 Live Student Scholar Matrix</h2>
+            // Populate Three-Dot Control Panel Data Variables concurrently
+            document.getElementById('profCardName').innerText = `Prof. ${loggedInFacultyContext.name}`;
+            document.getElementById('profCardPost').innerText = loggedInFacultyContext.post;
+            document.getElementById('profCardDept').innerText = `${loggedInFacultyContext.branch} Management`;
+            document.getElementById('profCardEmpId').innerText = loggedInFacultyContext.empId;
+            document.getElementById('profAvatarFrame').innerHTML = `<img src="${loggedInFacultyContext.image}" alt="Faculty Profile Picture">`;
+            document.getElementById('marksBranchSubtext').innerText = `Branch Context: Department of ${loggedInFacultyContext.branch}`;
+        } else {
+            authErrLog.style.display = 'block';
+        }
+    }
+
+    // 4. Panel Drawer Visibility Layout state toggle wrapper
+    function toggleControlDrawerConsole(openState) {
+        const drawer = document.getElementById('threeDotControlDrawer');
+        const mask = document.getElementById('blurOverlayMask');
+        if (openState) {
+            drawer.classList.add('is-expanded');
+            mask.style.display = 'block';
+        } else {
+            drawer.classList.remove('is-expanded');
+            mask.style.display = 'none';
+        }
+    }
+
+    // 5. Drawer Action Routing (Closes panel drawer and shifts module layouts directly to main desktop)
+    function routeWorkspaceContext(targetModule) {
+        // Toggle off drawer panel overlay safely first
+        toggleControlDrawerConsole(false);
+
+        // Hide generic fallback splash window panels
+        document.getElementById('defaultDashboardSplash').style.display = 'none';
+        document.getElementById('workspaceModuleAttendance').style.display = 'none';
+        document.getElementById('workspaceModuleMarks').style.display = 'none';
+
+        if (targetModule === 'attendance') {
+            document.getElementById('workspaceModuleAttendance').style.display = 'block';
+            renderAttendanceTableDataEngine();
+        } else if (targetModule === 'marks') {
+            document.getElementById('workspaceModuleMarks').style.display = 'block';
+            renderMarksTableDataEngine();
+        }
+    }
+
+    // 6. Semester Loop Change Handler (Restricts array parameters purely between 2, 4, 6)
+    function cycleSemesterTarget(moduleKey, direction) {
+        let activeSem = currentSelectedSemesters[moduleKey];
+        if (direction === 1 && activeSem < 6) activeSem += 2;
+        if (direction === -1 && activeSem > 2) activeSem -= 2;
+        
+        currentSelectedSemesters[moduleKey] = activeSem;
+        
+        // Update relevant textual displays
+        if (moduleKey === 'attendance') {
+            document.getElementById('attendanceSemLabel').innerText = `Semester: ${activeSem}`;
+            renderAttendanceTableDataEngine();
+        } else {
+            document.getElementById('marksSemLabel').innerText = `Semester: ${activeSem}`;
+            renderMarksTableDataEngine();
+        }
+    }
+
+    // 7. Render Core Table Logic Engine: Attendance View Grid
+    function renderAttendanceTableDataEngine() {
+        const tableBody = document.getElementById('attendanceGridDataEngine');
+        let htmlStructure = `
+            <tr>
+                <th>System Roll No</th>
+                <th>Student Structural Identity</th>
+                <th>Action Status Selection</th>
+            </tr>`;
+
+        erpStudentDatabase.forEach(student => {
+            htmlStructure += `
+                <tr>
+                    <td><strong>${student.rollNumber}</strong></td>
+                    <td>${student.name}</td>
+                    <td>
+                        <label style="cursor: pointer; display: flex; align-items: center; gap: 6px;">
+                            <input type="checkbox" class="attendance-checkbox-node" data-roll="${student.rollNumber}" ${student.present ? 'checked' : ''}> Present
+                        </label>
+                    </td>
+                </tr>`;
+        });
+        tableBody.innerHTML = htmlStructure;
+    }
+
+    // 8. Render Core Table Logic Engine: Integrated Marks Matrix Grid (Internal + Sessional)
+    function renderMarksTableDataEngine() {
+        const tableBody = document.getElementById('marksGridDataEngine');
+        let htmlStructure = `
+            <tr>
+                <th>System Roll No</th>
+                <th>Student Structural Identity</th>
+                <th>Internals Evaluation (Max 20)</th>
+                <th>Sessional Registry (Max 80)</th>
+            </tr>`;
+
+        erpStudentDatabase.forEach(student => {
+            htmlStructure += `
+                <tr>
+                    <td><strong>${student.rollNumber}</strong></td>
+                    <td>${student.name}</td>
+                    <td>
+                        <input type="number" class="score-entry-field internal-mark-input" data-roll="${student.rollNumber}" value="${student.internalMarks || 0}">
+                    </td>
+                    <td>
+                        <input type="number" class="score-entry-field sessional-mark-input" data-roll="${student.rollNumber}" value="${student.sessionalMarks || 0}">
+                    </td>
+                </tr>`;
+        });
+        tableBody.innerHTML = htmlStructure;
+        attachMarksValidationConstraints();
+    }
+
+    // 9. Strict Marks Guardrail Bound Interceptors
+    function attachMarksValidationConstraints() {
+        document.querySelectorAll('.score-entry-field').forEach(field => {
+            field.addEventListener('input', (e) => {
+                const numericVal = parseInt(e.target.value) || 0;
                 
-				<!-- Filters for Stream / Overlapping Classes -->
-				<div class="filter-row">
-					<select id="classFilter" onchange="filterClassData()">
-						<option value="BCA">BCA (Vth Sem) - Python Automation</option>
-						<option value="BBA">BBA (IIIrd Sem) - Advanced DBMS</option>
-					</select>
-					<input type="text" id="studentSearch" placeholder="Search Scholar Name/Roll No..." onkeyup="searchStudents()">
-				</div>
+                if (e.target.classList.contains('internal-mark-input') && numericVal > 20) {
+                    alert('ERP Boundary Constraint: Internal continuous assessments cannot scale past 20 Marks.');
+                    e.target.value = 20;
+                }
+                if (e.target.classList.contains('sessional-mark-input') && numericVal > 80) {
+                    alert('ERP Boundary Constraint: Sessional major exam matrix records cannot exceed 80 Marks.');
+                    e.target.value = 80;
+                }
+                if (numericVal < 0) e.target.value = 0;
+            });
+        });
+    }
 
-				<!-- Interactive Data Table Matrix -->
-				<div class="table-wrapper">
-					<table>
-						<thead>
-							<tr>
-								<th>Roll No</th>
-								<th>Scholar Name</th>
-								<th>Attendance Status</th>
-								<th>Internal Marks (Max 20)</th>
-								<th>Practical Marks (Max 30)</th>
-							</tr>
-						</thead>
-						<tbody id="studentTableBody">
-							<!-- Rows will be dynamically loaded via script inside loop -->
-						</tbody>
-					</table>
-				</div>
+    // 10. Memory Serialization Storage Shifters
+    function saveAttendanceMatrixToStorage() {
+        const dateIndex = document.getElementById('attendanceDatePicker').value;
+        document.querySelectorAll('.attendance-checkbox-node').forEach(checkbox => {
+            const roll = checkbox.getAttribute('data-roll');
+            const targetStudent = erpStudentDatabase.find(s => s.rollNumber === roll);
+            if (targetStudent) targetStudent.present = checkbox.checked;
+        });
+        localStorage.setItem('studentData_v2', JSON.stringify(erpStudentDatabase));
+        alert(`Attendance roster successfully finalized to memory node for Day/Date: [${dateIndex}] - Sem: [${currentSelectedSemesters.attendance}]`);
+    }
 
-				<button class="action-btn" onclick="saveAcademicRecords()">Commit Data Changes to Mainframe</button>
-			</div>
+    function saveGradesMatrixToStorage() {
+        document.querySelectorAll('.internal-mark-input').forEach(input => {
+            const roll = input.getAttribute('data-roll');
+            const targetStudent = erpStudentDatabase.find(s => s.rollNumber === roll);
+            if (targetStudent) targetStudent.internalMarks = parseInt(input.value) || 0;
+        });
+        document.querySelectorAll('.sessional-mark-input').forEach(input => {
+            const roll = input.getAttribute('data-roll');
+            const targetStudent = erpStudentDatabase.find(s => s.rollNumber === roll);
+            if (targetStudent) targetStudent.sessionalMarks = parseInt(input.value) || 0;
+        });
+        localStorage.setItem('studentData_v2', JSON.stringify(erpStudentDatabase));
+        alert(`Academic scores spreadsheet compiled and saved for Semester: [${currentSelectedSemesters.marks}]`);
+    }
 
-		</div>
-	</div>
+    // Session Destroyer Interface Router
+    function terminateActiveSession() {
+        loggedInFacultyContext = null;
+        document.getElementById('facultyIdField').value = '';
+        document.getElementById('facultySecretField').value = '';
+        document.getElementById('portalMainWorkspaceView').style.display = 'none';
+        
+        // Reset dynamic panels targets layouts elements
+        document.getElementById('defaultDashboardSplash').style.display = 'block';
+        document.getElementById('workspaceModuleAttendance').style.display = 'none';
+        document.getElementById('workspaceModuleMarks').style.display = 'none';
+        
+        document.getElementById('portalAuthGatewayNode').style.display = 'block';
+        document.body.style.alignItems = 'center';
+    }
+</script>
 
-	<!-- ⚙️ Back-end Logic Control Script -->
-	<script>
-		// Check Authentication Guard
-		if (localStorage.getItem("isLoggedIn") !== "true" || localStorage.getItem("userRole") !== "professor") {
-			window.location.href = "login.html";
-		}
-
-		// Toggle Function for Left Three-Dot Sidebar Profile Drawer
-		function toggleSidebar() {
-			const sidebar = document.getElementById("profileSidebar");
-			const overlay = document.getElementById("overlay");
-			sidebar.classList.toggle("open");
-			overlay.classList.toggle("active");
-		}
-
-		// Mock Database Object comprising Students across BCA & BBA overlapping zones
-		const studentDatabase = {
-			BCA: [
-				{ roll: "BCA-501", name: "Aman Verma", present: true, internal: 18, practical: 28 },
-				{ roll: "BCA-502", name: "Rahul Yadav", present: true, internal: 15, practical: 24 },
-				{ roll: "BCA-503", name: "Priya Sharma", present: false, internal: 19, practical: 29 },
-				{ roll: "BCA-504", name: "Vikram Malhotra", present: true, internal: 12, practical: 20 }
-			],
-			BBA: [
-				{ roll: "BBA-301", name: "Sneha Goel", present: true, internal: 17, practical: 26 },
-				{ roll: "BBA-302", name: "Kartik Mehta", present: false, internal: 14, practical: 22 },
-				{ roll: "BBA-303", name: "Rohan Kapoor", present: true, internal: 16, practical: 25 }
-			]
-		};
-
-		// Render Student data based on class filter
-		function loadStudentMatrix(stream) {
-			const tbody = document.getElementById("studentTableBody");
-			tbody.innerHTML = "";
-            
-			const list = studentDatabase[stream];
-			list.forEach((student, index) => {
-				tbody.innerHTML += `
-					<tr class="student-row">
-						<td style="font-weight:700; color:#cbd5e1;">${student.roll}</td>
-						<td>${student.name}</td>
-						<td>
-							<input type="checkbox" id="att-${stream}-${index}" ${student.present ? 'checked' : ''}>
-							<label style="margin-left: 5px;">${student.present ? 'Present' : 'Absent'}</label>
-						</td>
-						<td>
-							<input type="number" class="input-score" id="int-${stream}-${index}" value="${student.internal}" min="0" max="20">
-						</td>
-						<td>
-							<input type="number" class="input-score" id="prac-${stream}-${index}" value="${student.practical}" min="0" max="30">
-						</td>
-					</tr>
-				`;
-			});
-		}
-
-		function filterClassData() {
-			const selectedClass = document.getElementById("classFilter").value;
-			loadStudentMatrix(selectedClass);
-		}
-
-		// Search algorithm filtering rows inside viewport
-		function searchStudents() {
-			const query = document.getElementById("studentSearch").value.toLowerCase();
-			const rows = document.querySelectorAll(".student-row");
-            
-			rows.forEach(row => {
-				const text = row.innerText.toLowerCase();
-				row.style.display = text.includes(query) ? "" : "none";
-			});
-		}
-
-		// Trigger on save changes
-		function saveAcademicRecords() {
-			alert("Mainframe Updated Successfully: Attendance locks synchronized and marks uploaded to central server.");
-		}
-
-		function handleLogout() {
-			localStorage.clear();
-			window.location.href = "index.html";
-		}
-
-		// Initialize viewport data bindings
-		document.addEventListener("DOMContentLoaded", () => {
-			loadStudentMatrix("BCA");
-		});
-	</script>
 </body>
 </html>
